@@ -73,6 +73,18 @@ static NSString* const setDefaultOptions	= @"setDefaultOptions";
 		
 		[CATransaction commit];
 	}
+    
+    if ([vc isKindOfClass:[RNNTabBarController class]]) {
+        RNNTabBarController* rootVc = (RNNTabBarController*)vc;
+        RNNRootViewController* leafVC = [rootVc getLeafViewController];
+        [leafVC.options mergeWith:options];
+        [CATransaction begin];
+        [CATransaction setCompletionBlock:completion];
+        
+        [leafVC.options applyOn:vc];
+        
+        [CATransaction commit];
+    }
 
 	if ([vc isKindOfClass:[RNNSplitViewController class]]) {
 		RNNSplitViewController* splitVc = (RNNSplitViewController*)vc;

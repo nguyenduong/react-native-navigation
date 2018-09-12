@@ -246,10 +246,19 @@
 }
 
 - (void)navigationController:(UINavigationController *)navigationController didShowViewController:(UIViewController *)viewController animated:(BOOL)animated{
-	RNNRootViewController* vc =  (RNNRootViewController*)viewController;
-	if (![vc.options.topBar.backButton.transition isEqualToString:@"custom"]){
-		navigationController.delegate = nil;
-	}
+    if ([viewController isKindOfClass:RNNRootViewController.class]) {
+        RNNRootViewController* vc =  (RNNRootViewController*)viewController;
+        if (![vc.options.topBar.backButton.transition isEqualToString:@"custom"]){
+            navigationController.delegate = nil;
+        }
+    } else if ([viewController isKindOfClass: RNNTabBarController.class]) {
+        RNNTabBarController* vc =  (RNNTabBarController*)viewController;
+        
+        if (![[vc getLeafViewController].options.topBar.backButton.transition isEqualToString:@"custom"]) {
+            navigationController.delegate = nil;
+        }
+        
+    }
 }
 
 - (id<UIViewControllerAnimatedTransitioning>)navigationController:(UINavigationController *)navigationController

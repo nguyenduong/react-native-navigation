@@ -7,11 +7,21 @@ extern const NSInteger BLUR_TOPBAR_TAG;
 - (void)applyOn:(UIViewController *)viewController {
 	if (self.currentTabIndex) {
 		[viewController.tabBarController setSelectedIndex:[self.currentTabIndex unsignedIntegerValue]];
+        //[(RNNTabBarController*)viewController setSelectedIndex:[self.currentTabIndex unsignedIntegerValue]];
 	}
 	
 	if (self.currentTabId) {
 		[(RNNTabBarController*)viewController.tabBarController setSelectedIndexByComponentID:self.currentTabId];
+        //[(RNNTabBarController*)viewController setSelectedIndexByComponentID:self.currentTabId];
 	}
+    
+    if (self.visible) {
+        [(RNNTabBarController*)viewController.tabBarController setTabBarHidden:![self.visible boolValue] animated:NO];
+        /*
+        if ([viewController isKindOfClass:RNNTabBarController.class]) {
+            [(RNNTabBarController*)viewController setTabBarHidden:![self.visible boolValue] animated:NO];
+        }*/
+    }
 	
 	if (self.testID) {
 		viewController.tabBarController.tabBar.accessibilityIdentifier = self.testID;

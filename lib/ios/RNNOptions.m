@@ -66,7 +66,13 @@
 			if ([typeClass isSubclassOfClass:[RNNOptions class]]) {
 				RNNOptions* value = [[typeClass alloc] initWithDict:dict[propertyName]];
 				[self setValue:value forKey:propertyName];
-			}
+            } else if ([typeClass isEqual:NSNumber.class] || [typeClass isEqual:NSString.class]){
+                id value = dict[propertyName];
+                if (value != nil)
+                    [self setValue:value forKey:propertyName];
+            }
+            
+            
 		}
 		
 	}

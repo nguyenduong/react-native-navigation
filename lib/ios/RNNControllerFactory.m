@@ -129,8 +129,13 @@
 	RNNNavigationController* vc = [[RNNNavigationController alloc] initWithOptions:options];
 	[vc setComponentId:node.nodeId];
 	NSMutableArray* controllers = [NSMutableArray new];
+    UIViewController* childVc;
 	for (NSDictionary* child in node.children) {
-		[controllers addObject:[self fromTree:child]];
+        if ([[child objectForKey:@"type"] isEqualToString:@"ExternalComponent"]) {
+            childVc = [self fromTree:child];
+        } else {
+            [controllers addObject:[self fromTree:child]];
+        }
 	}
 	[vc setViewControllers:controllers];
 	[vc.getLeafViewController mergeOptions:options];
@@ -141,15 +146,46 @@
 -(UIViewController<RNNRootViewProtocol> *)createTabs:(RNNLayoutNode*)node {
 	RNNTabBarController* vc = [[RNNTabBarController alloc] initWithEventEmitter:_eventEmitter];
 	RNNNavigationOptions* options = [self createOptions:node.data[@"options"]];
-
+    //[vc.getLeafViewController mergeOptions:options];
+    
+    UIViewController* childTabbar;
+    
 	NSMutableArray* controllers = [NSMutableArray new];
 	for (NSDictionary *child in node.children) {
-		UIViewController<RNNRootViewProtocol>* childVc = [self fromTree:child];
-		[childVc applyTabBarItem];
+        
+        if ([[child objectForKey:@"type"] isEqualToString:@"ExternalComponent"]) {
+            childTabbar = [self fromTree:child];
+        } else {
+            UIViewController<RNNRootViewProtocol>* childVc = [self fromTree:child];
+            [childVc applyTabBarItem];
+            [controllers addObject:childVc];
+        }
 		
-		[controllers addObject:childVc];
 	}
-	[vc setViewControllers:controllers];
+    [vc setViewControllers:controllers];
+    
+    if (childTabbar) {
+        
+        //[vc.tabBar setHidden:YES];
+        
+        
+        childTabbar.view.frame = CGRectMake(0, vc.view.frame.size.height, vc.view.frame.size.width, 50);
+        
+        NSLog(@"Navigation: %@\n", vc.navigationController);
+        
+        [vc addChildViewController:childTabbar];
+        [vc.view addSubview:childTabbar.view];
+        
+        //vc.view.frame = CGRectMake(0, 0, vc.view.frame.size.width, vc.view.frame.size.height + 50);
+        //vc.view.backgroundColor = [UIColor colorWithRed:1 green:0 blue:0 alpha:0.5];
+        
+        
+        //[vc.tabBar setValue:[[UITabBar alloc] init] forKey:@"tabBar"];
+        //[vc addChildViewController:childTabbar];
+        
+        //[vc.tabBar addSubview:childTabbar.view];
+
+    }
 	[vc.getLeafViewController mergeOptions:options];
 	
 	return vc;
