@@ -8,6 +8,7 @@
 #import "RNNElementFinder.h"
 #import "React/RCTUIManager.h"
 #import "RNNErrorHandler.h"
+#import "RNNTabBarController.h"
 
 static NSString* const setRoot	= @"setRoot";
 static NSString* const setStackRoot	= @"setStackRoot";

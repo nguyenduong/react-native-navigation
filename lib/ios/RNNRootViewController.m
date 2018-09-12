@@ -5,6 +5,7 @@
 #import "RNNCustomTitleView.h"
 #import "RNNPushAnimation.h"
 #import "RNNReactRootView.h"
+#import "RNNTabBarController.h"
 
 @interface RNNRootViewController() {
 	RNNReactRootView* _customTitleView;
