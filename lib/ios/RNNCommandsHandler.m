@@ -9,6 +9,7 @@
 #import "React/RCTUIManager.h"
 #import "RNNErrorHandler.h"
 #import "RNNTabBarController.h"
+#import "RNNSideMenuController.h"
 
 static NSString* const setRoot	= @"setRoot";
 static NSString* const setStackRoot	= @"setStackRoot";
@@ -190,13 +191,24 @@ static NSString* const setDefaultOptions	= @"setDefaultOptions";
 
 - (void)popTo:(NSString*)componentId completion:(RNNTransitionCompletionBlock)completion rejection:(RCTPromiseRejectBlock)rejection {
 	[self assertReady];
-	RNNRootViewController *vc = (RNNRootViewController*)[_store findComponentForId:componentId];
-	
-	[_stackManager popTo:vc animated:vc.options.animations.pop.enable completion:^(NSArray *poppedViewControllers) {
-		[_eventEmitter sendOnNavigationCommandCompletion:popTo params:@{@"componentId": componentId}];
-		[self removePopedViewControllers:poppedViewControllers];
-		completion();
-	} rejection:rejection];
+    UIViewController* uivc = [_store findComponentForId:componentId];
+    
+    RNNRootViewController *vc = nil;
+    if ([uivc isKindOfClass:RNNRootViewController.class]) {
+        vc = (RNNRootViewController*)uivc;
+        [vc.options mergeWith:options];
+        [_stackManager popTo:vc animated:vc.options.animations.pop.enable completion:^(NSArray *poppedViewControllers) {
+            [_eventEmitter sendOnNavigationCommandCompletion:popTo params:@{@"componentId": componentId}];
+            [self removePopedViewControllers:poppedViewControllers];
+            completion();
+        } rejection:rejection];
+    } else if ([uivc isKindOfClass:RNNSideMenuController.class]) {
+        [_stackManager popTo:uivc animated:YES completion:^(NSArray *poppedViewControllers) {
+            [_eventEmitter sendOnNavigationCommandCompletion:popTo params:@{@"componentId": componentId}];
+            [self removePopedViewControllers:poppedViewControllers];
+            completion();
+        } rejection:rejection];
+    }
 }
 
 -(void) popToRoot:(NSString*)componentId completion:(RNNTransitionCompletionBlock)completion rejection:(RCTPromiseRejectBlock)rejection {
